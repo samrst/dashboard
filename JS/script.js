@@ -183,20 +183,36 @@ function updateCharts() {
             ? (d['Curso'] || 'S/I')
             : (d['Unidade operacional (Escola)'] || 'S/I');
 
-        dataAlunos[k] = (dataAlunos[k] || 0) + d._total_alunos;
-    });
+        if (!dataAlunos[k]) {
+                dataAlunos[k] = {
+                    v1: 0,
+                    v2: 0
+                };
+            }
 
-    renderBar(
-        'chart-alunos-escola',
-        Object.keys(dataAlunos),
-        [{
-            label: 'Qtd Alunos',
-            data: Object.values(dataAlunos),
-            color: '#005599'
-        }],
-        'x',
-        false
-    );
+            dataAlunos[k].v1 += d._total_alunos;
+            dataAlunos[k].v2 += d._prova_objetiva;
+        });
+
+        renderBar(
+            'chart-alunos-escola',
+            Object.keys(dataAlunos),
+            [
+                {
+                    label: 'Alunos Homologados',
+                    data: Object.values(dataAlunos).map(v => v.v1),
+                    color: '#005599'
+                },
+                {
+                    label: 'Não Homologados',
+                    data: Object.values(dataAlunos).map(v => v.v2),
+                    color: '#94a3b8'
+                }
+            ],
+            'x',
+            true
+        );
+
     // 2. Homologados vs Agendados — BARRAS agrupadas por Curso
     const groupKey = 'Curso';
     const groupAgg = {};
@@ -266,12 +282,12 @@ renderBar(
     Object.keys(dataApp),
     [
         {
-            label: 'Aplicadas',
+            label: 'Agendadas',
             data: Object.values(dataApp).map(v => v.v1),
             color: '#005599'
         },
         {
-            label: 'Não Aplicadas',
+            label: 'Não Agendadas',
             data: Object.values(dataApp).map(v => v.v2),
             color: '#94a3b8'
         }
