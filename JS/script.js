@@ -139,17 +139,19 @@ function updateCharts() {
     renderPie('chart-tabulacao-pizza', ['Feita', 'Pendente'], [sumMetric('_tabulacao_feita'), sumMetric('_tabulacao_pendente')], ['#003DA5', '#00aaff']);
 
     // 5. Percentual (Melhorado com cores dinâmicas e ordenação)
-    const dPct = aggregate(isAll ? keysMap.unidade : keysMap.curso, ['_prova_objetiva', '_total_alunos']);
+    const dPct = aggregate(isAll ? keysMap.unidade : keysMap.curso, ['_prova_objetiva', '_tabulacao_feita']);
     const resPct = Object.entries(dPct).map(([n, v]) => {
-        const p = v._prova_objetiva ? (v._total_alunos / v._prova_objetiva * 100) : 0;
-        return { n, p: Number(p.toFixed(1)) };
+        const p = v._prova_objetiva ? (v._tabulacao_feita / v._prova_objetiva * 100) : 0
+        const l = v._tabulacao_feita
+        return { n, p: Number(p.toFixed(1)), l };
     }).sort((a, b) => a.p - b.p);
 
     renderBar('chart-percentual-pratica', resPct.map(r => r.n), [{
-        label: '% da Prova Objetiva',
-        data: resPct.map(r => r.p),
-        backgroundColor: resPct.map(r => r.p < 50 ? '#ef4444' : (r.p < 80 ? '#f59e0b' : '#003DA5'))
-    }], 'y', false, true);
+    label: '% da Prova Objetiva',
+    data: resPct.map(r => r.p),
+    alunos: resPct.map(r => r.l), // adiciona esta linha
+    backgroundColor: resPct.map(r => r.p < 50 ? '#ef4444' : (r.p < 80 ? '#94a3b8' : '#003DA5'))
+}], 'y', false, true);
 }
 
 function renderBar(id, labels, datasets, axis = 'x', stacked = false, isPercent = false) {
@@ -166,7 +168,14 @@ function renderBar(id, labels, datasets, axis = 'x', stacked = false, isPercent 
             legend: { position: 'bottom' },
             tooltip: { 
                 callbacks: { 
-                    label: c => `${c.dataset.label}: ${isPercent ? c.raw + '%' : c.raw.toLocaleString('pt-BR')}` 
+                    label: c => {
+                        if (isPercent) {
+                            const alunos = c.dataset.alunos?.[c.dataIndex];
+                            return `${c.dataset.label}: ${c.raw}% (${alunos} alunos)`;
+                        }
+
+                        return `${c.dataset.label}: ${c.raw.toLocaleString('pt-BR')}`;
+                    }
                 } 
             }
         } 
