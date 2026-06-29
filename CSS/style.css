@@ -491,6 +491,36 @@ tr:hover { background: #f9fafb; }
     text-align: right;
 }
 
+/* ===== Gráfico de Participação Prática ===== */
+
+.card-full {
+    grid-column: 1 / -1;
+}
+
+.chart-large {
+    position: relative;
+    width: 100%;
+    height: 500px;
+}
+
+@media (max-width: 992px) {
+    .chart-large {
+        height: 420px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-large {
+        height: 350px;
+    }
+}
+
+@media (max-width: 576px) {
+    .chart-large {
+        height: 280px;
+    }
+}
+
 /* ===== Scrollspy viewport (gráfico de homologação) ===== */
 .scrollspy-viewport {
     position: relative;
